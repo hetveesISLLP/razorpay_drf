@@ -1,7 +1,9 @@
 from django.urls import path
-from . views import create_payment_link, verify_payment_link_signature
+from .views import create_payment_link, PaymentHandler
 
 urlpatterns = [
+    # for creating payment link
     path('', create_payment_link, name='create_payment'),
-    path('callback-url.com/', verify_payment_link_signature, name='verify_pl'),
+    # for verifying signature and handle payment
+    path('callback-url.com/', PaymentHandler.as_view(), name='verify_pl'),
 ]
