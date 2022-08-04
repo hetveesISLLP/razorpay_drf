@@ -5,5 +5,6 @@ urlpatterns = [
     # for creating payment link
     path('', create_payment_link, name='create_payment'),
     # for verifying signature and handle payment
-    path('callback-url.com/', PaymentHandler.as_view(), name='verify_pl'),
+    path('callback-url/', PaymentHandler.as_view(), name='verify_pl')
+
 ]

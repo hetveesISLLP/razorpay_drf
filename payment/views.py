@@ -1,7 +1,12 @@
 import json
 import os
+import uuid
+
+from django.http import HttpRequest, HttpResponse
 from dotenv import load_dotenv
 from rest_framework import status
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.models import User
 from rest_framework.response import Response
 from django.conf import settings
 from rest_framework.views import APIView
@@ -16,25 +21,33 @@ load_dotenv()
 @api_view(['POST'])
 def create_payment_link(request):
     # creating a payment link using request.data values
-    payment_link = client.payment_link.create(request.data)
-    # The data should be passed in this format
-    # ({
-    #     "amount": 50000,
-    #     "currency": "INR",
-    #     "description": "For XYZ purpose",
-    #     "customer": {
-    #         "name": "Hetvee SHah",
-    #         "email": "shahhetu.hs@gmail.com",
-    #         "contact": "+918866911353"
-    #     },
-    #     "notify": {
-    #         "sms": True,
-    #         "email": True,
-    #     },
-    #     "reference_id": uuid.uuid4().hex[:6].upper(),
-    #     "callback_url": "http://127.0.0.1:8000/callback-url.com/",
-    #     "callback_method": "get"
-    # })
+    try:
+        payment_link = client.payment_link.create(
+            # The data should be passed in this format
+            {
+                # total amount of the product required
+                "amount": 50000,
+                "currency": "INR",
+                # description of the product
+                "description": "For XYZ purpose",
+                # details of the customer
+                "customer": {
+                    "name": "Hetvee SHah",
+                    "email": "shahhetu.hs@gmail.com",
+                    "contact": "+918866911353"
+                },
+                # notify the payment link via sms and email
+                "notify": {
+                    "sms": True,
+                    "email": True,
+                },
+                "reference_id": uuid.uuid4().hex[:6].upper(),
+                # handler of payment
+                "callback_url": request.build_absolute_uri() + "callback-url",
+                "callback_method": "get"
+            })
+    except exceptions as e:
+        return Response({"message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
     return Response(payment_link)
 
 
@@ -67,21 +80,21 @@ class PaymentHandler(APIView):
             return Response({"message": "Payment link details not found"}, status=status.HTTP_404_NOT_FOUND)
 
     # required for webhook
+    # this will work if you use ngrok and post generated url in razorpay dashboard setting webhook url
     def post(self, request):
         captured_data = json.loads(request.body)
-        print()
         try:
             client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                                     request.headers['X-Razorpay-Signature'],
                                                     os.environ.get('RAZORPAY_SECRET_KEY'))
             # if payment is captured
             if captured_data['event'] == 'payment.captured':
-                print("Success")
+                print("Successfully captured payment")
                 return Response({"message": "Payment Succeced"}, status=status.HTTP_200_OK)
             # if payment is not captured or payment is failed.
-            print("Failed")
+            print("Failed to capture payment")
             return Response({"message": "Payment Failed"}, status=status.HTTP_400_BAD_REQUEST)
         # if webhook signature verification failed.
         except Exception as e:
-            print(e, 'JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ')
+            print(e, 'Exception occured')
             return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_400_BAD_REQUEST)
