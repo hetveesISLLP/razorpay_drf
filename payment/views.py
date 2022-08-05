@@ -72,7 +72,8 @@ class PaymentHandler(APIView):
             verify_pay_link = client.utility.verify_payment_link_signature(params)
             # if verified payment_link_signature
             if verify_pay_link:
-                return Response({"message": "Payment is successful."}, status=status.HTTP_200_OK)
+                return HttpResponse("Payment successfullllllllllll")
+                # return Response({"message": "Payment is successful."}, status=status.HTTP_200_OK)
             # if payment_link_signature is not verified
             return Response({"message": "Payment link verification failed"}, status=status.HTTP_400_BAD_REQUEST)
         except exceptions.BadRequest:
