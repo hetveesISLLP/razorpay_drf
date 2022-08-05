@@ -19,7 +19,7 @@ load_dotenv()
 @api_view(['POST'])
 def create_payment_link(request):
     # creating a payment link using request.data values
-    print(request.build_absolute_uri())
+    # print(request.build_absolute_uri())
     try:
         payment_link = client.payment_link.create(
             # The data should be passed in this format
