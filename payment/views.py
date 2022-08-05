@@ -83,20 +83,18 @@ class PaymentHandler(APIView):
             client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                                     request.headers['X-Razorpay-Signature'],
                                                     settings.RAZORPAY_SECRET_KEY)
-            # client.utility.verify_webhook_signature(request.body,
-            #                                         request.headers['X-Razorpay-Signature'],
-            #                                         os.environ.get('RAZORPAY_SECRET_KEY'))
             # if payment is captured
             if captured_data['event'] == 'payment.captured':
                 print("Successfully captured payment")
                 return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
             # if payment is not captured or payment is failed.
-            print("Failed to capture payment")
-            return Response({"message": "Payment Failed"}, status=status.HTTP_400_BAD_REQUEST)
+            elif captured_data['event'] == 'payment.failed':
+                print("Failed to capture payment")
+                return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
         # if webhook signature verification failed.
-        except exceptions.BadRequest:
-            print('Exception occurred')
-            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_400_BAD_REQUEST)
         except razorpay.errors.SignatureVerificationError as ve:
-            print(ve,"Verification fail")
-            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_400_BAD_REQUEST)
+            print(ve, "Verification fail")
+            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
+        except exceptions as e:
+            print(e, 'Exception occurred')
+            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
