@@ -52,6 +52,7 @@ def create_payment_link(request):
 
 class PaymentHandler(APIView):
     def get(self, request):
+        print("inside get")
         try:
             params = {
                 # get payment_link_id from request
