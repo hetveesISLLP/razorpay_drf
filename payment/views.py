@@ -41,7 +41,7 @@ def create_payment_link(request):
                 },
                 "reference_id": uuid.uuid4().hex[:6].upper(),
                 # handler of payment
-                "callback_url": request.build_absolute_uri() + "callback-url",
+                "callback_url": request.build_absolute_uri() + "callback-url/",
                 "callback_method": "get"
             })
         return Response(payment_link, status=status.HTTP_200_OK)
