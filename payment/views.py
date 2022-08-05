@@ -97,3 +97,6 @@ class PaymentHandler(APIView):
         except exceptions.BadRequest:
             print('Exception occurred')
             return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_400_BAD_REQUEST)
+        except razorpay.errors.SignatureVerificationError as ve:
+            print(ve,"Verification fail")
+            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_400_BAD_REQUEST)
