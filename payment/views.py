@@ -1,12 +1,8 @@
 import json
 import os
 import uuid
-
-from django.http import HttpRequest, HttpResponse
 from dotenv import load_dotenv
 from rest_framework import status
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.auth.models import User
 from rest_framework.response import Response
 from django.conf import settings
 from rest_framework.views import APIView
@@ -26,29 +22,29 @@ def create_payment_link(request):
             # The data should be passed in this format
             {
                 # total amount of the product required
-                "amount": 50000,
+                "amount": request.data.get('amount'),
+                # takes INR by default not req (comes in mail in payment link)
                 "currency": "INR",
-                # description of the product
-                "description": "For XYZ purpose",
-                # details of the customer
-                "customer": {
-                    "name": "Hetvee SHah",
-                    "email": "shahhetu.hs@gmail.com",
-                    "contact": "+918866911353"
-                },
+                # description of the product not req (comes in mail in payment link)
+                "description": request.data.get('description'),
+                # details of the customer (name not req, email req if u want to notify via email, same for phone)
+                "customer": request.data.get('customer'),
                 # notify the payment link via sms and email
                 "notify": {
                     "sms": True,
                     "email": True,
+                },
+                "notes": {
+                    "address": request.data.get('address')
                 },
                 "reference_id": uuid.uuid4().hex[:6].upper(),
                 # handler of payment
                 "callback_url": request.build_absolute_uri() + "callback-url",
                 "callback_method": "get"
             })
-    except exceptions as e:
-        return Response({"message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(payment_link)
+        return Response(payment_link, status=status.HTTP_200_OK)
+    except exceptions.BadRequest:
+        return Response({"message": "Payment link creation failed."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 '''Handler of callback url'''
@@ -76,7 +72,7 @@ class PaymentHandler(APIView):
                 return Response({"message": "Payment is successful."}, status=status.HTTP_200_OK)
             # if payment_link_signature is not verified
             return Response({"message": "Payment link verification failed"}, status=status.HTTP_400_BAD_REQUEST)
-        except:
+        except exceptions.BadRequest:
             return Response({"message": "Payment link details not found"}, status=status.HTTP_404_NOT_FOUND)
 
     # required for webhook
@@ -90,11 +86,11 @@ class PaymentHandler(APIView):
             # if payment is captured
             if captured_data['event'] == 'payment.captured':
                 print("Successfully captured payment")
-                return Response({"message": "Payment Succeced"}, status=status.HTTP_200_OK)
+                return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
             # if payment is not captured or payment is failed.
             print("Failed to capture payment")
             return Response({"message": "Payment Failed"}, status=status.HTTP_400_BAD_REQUEST)
         # if webhook signature verification failed.
-        except Exception as e:
-            print(e, 'Exception occured')
+        except exceptions.BadRequest:
+            print('Exception occurred')
             return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_400_BAD_REQUEST)
