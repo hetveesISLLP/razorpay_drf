@@ -1,0 +1,1 @@
+web: gunicorn payment_razorpay.wsgi
