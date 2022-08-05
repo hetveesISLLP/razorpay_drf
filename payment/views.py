@@ -21,7 +21,7 @@ def create_payment_link(request):
         payment_link = client.payment_link.create(
             # The data should be passed in this format
             {
-                # total amount of the product required
+                # total amount of the product(in smallest unit, for INR, its paise) required
                 "amount": request.data.get('amount'),
                 # takes INR by default not req (comes in mail in payment link)
                 "currency": "INR",
@@ -52,7 +52,7 @@ def create_payment_link(request):
 
 class PaymentHandler(APIView):
     def get(self, request):
-        print("inside get")
+
         try:
             params = {
                 # get payment_link_id from request
@@ -83,7 +83,7 @@ class PaymentHandler(APIView):
         try:
             client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                                     request.headers['X-Razorpay-Signature'],
-                                                    settings.RAZORPAY_SECRET_KEY)
+                                                    os.environ.get('RAZORPAY_SECRET_KEY'))
             # if payment is captured
             if captured_data['event'] == 'payment.captured':
                 print("Successfully captured payment")
