@@ -1,6 +1,8 @@
 import json
 import os
 import uuid
+
+from django.http import HttpResponse
 from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.response import Response
@@ -87,15 +89,19 @@ class PaymentHandler(APIView):
             # if payment is captured
             if captured_data['event'] == 'payment.captured':
                 print("Successfully captured payment")
-                return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
+                # return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
+                return Response(status=status.HTTP_200_OK)
             # if payment is not captured or payment is failed.
             elif captured_data['event'] == 'payment.failed':
                 print("Failed to capture payment")
-                return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
+                # return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
+                return Response(status=status.HTTP_205_RESET_CONTENT)
         # if webhook signature verification failed.
         except razorpay.errors.SignatureVerificationError as ve:
             print(ve, "Verification fail")
-            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
+            # return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
+            return Response(status=status.HTTP_205_RESET_CONTENT)
         except exceptions as e:
             print(e, 'Exception occurred')
-            return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
+            # return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
+            return Response(status=status.HTTP_205_RESET_CONTENT)
