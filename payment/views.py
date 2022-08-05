@@ -82,7 +82,7 @@ class PaymentHandler(APIView):
         try:
             client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                                     request.headers['X-Razorpay-Signature'],
-                                                    os.environ.get('RAZORPAY_SECRET_KEY'))
+                                                    settings.RAZORPAY_SECRET_KEY)
             # client.utility.verify_webhook_signature(request.body,
             #                                         request.headers['X-Razorpay-Signature'],
             #                                         os.environ.get('RAZORPAY_SECRET_KEY'))
