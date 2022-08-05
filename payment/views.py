@@ -81,8 +81,8 @@ class PaymentHandler(APIView):
         captured_data = json.loads(request.body)
         try:
             client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
-                                                    request.headers['X-Razorpay-Signature'],
-                                                    os.environ.get('RAZORPAY_SECRET_KEY'))
+                                                    request.headers['X-Razorpay-Signature'],"123456")
+            # os.environ.get('RAZORPAY_SECRET_KEY')
             # if payment is captured
             if captured_data['event'] == 'payment.captured':
                 print("Successfully captured payment")
