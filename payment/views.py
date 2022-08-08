@@ -18,8 +18,7 @@ load_dotenv()
 
 @api_view(['POST'])
 def create_payment_link(request):
-    # creating a payment link using request.data values
-    # print(request.build_absolute_uri())
+    # creating a payment link
     try:
         payment_link = client.payment_link.create(
             # The data should be passed in this format
@@ -72,39 +71,22 @@ class PaymentHandler(APIView):
             # verify payment link signature
             client.utility.verify_payment_link_signature(params)
             # if verified payment_link_signature
-            # if verify_pay_link:
-            return HttpResponse("Payment successfullllllllllll")
-                # return Response({"message": "Payment is successful."}, status=status.HTTP_200_OK)
-            # if payment_link_signature is not verified
-            # return Response({"message": "Payment link verification failed"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Payment is successful."}, status=status.HTTP_200_OK)
         except exceptions.BadRequest:
-            # return Response({"message": "Payment link details not found"}, status=status.HTTP_404_NOT_FOUND)
-            return HttpResponse("Payment faillllllllllll")
+            return Response({"message": "Payment link details not found"}, status=status.HTTP_404_NOT_FOUND)
+
 
     # required for webhook
     # this will work if you use ngrok and post generated url in razorpay dashboard setting webhook url
     def post(self, request):
         captured_data = json.loads(request.body)
-        # try:
         client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                                 request.headers['X-Razorpay-Signature'],
                                                 os.environ.get('RAZORPAY_SECRET_KEY'))
         # if payment is captured
         if captured_data['event'] == 'payment.captured':
-            # print("Successfully captured payment")
-            # return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_200_OK)
+            return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
         # if payment is not captured or payment is failed.
         elif captured_data['event'] == 'payment.failed':
-            # print("Failed to capture payment")
-            # return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        # if webhook signature verification failed.
-        # except razorpay.errors.SignatureVerificationError as ve:
-        #     print(ve, "Verification fail")
-        #     # return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
-        #     return Response(status=status.HTTP_205_RESET_CONTENT)
-        # except exceptions as e:
-        #     print(e, 'Exception occurred')
-        #     # return Response({"message": "Webhook signature verification failed."}, status=status.HTTP_205_RESET_CONTENT)
-        #     return Response(status=status.HTTP_205_RESET_CONTENT)
+            return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
+
