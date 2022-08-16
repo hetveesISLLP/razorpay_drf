@@ -90,3 +90,18 @@ class PaymentHandler(APIView):
         elif captured_data['event'] == 'payment.failed':
             return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
 
+
+
+# Data to be passed as :
+# {
+#     "amount": 500,
+#     "description": "djkshcvdkcjd",
+#     "customer":{
+#         "name": "Hetu",
+#         "email": "sjd@dhcde.com",
+#         "contact": "+91123456789"
+#     },
+#     "notes": {
+#         "address": "asdjhwjidws"
+#     }
+# }

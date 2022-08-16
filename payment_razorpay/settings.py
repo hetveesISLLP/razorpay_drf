@@ -26,9 +26,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID')
 RAZORPAY_SECRET_KEY = os.environ.get('RAZORPAY_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'payment-razorpay-drf.herokuapp']
 
 
 # Application definition
