@@ -1,18 +1,13 @@
-import json
-import os
-import uuid
-
-from django.http import HttpResponse
 from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.response import Response
-from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-import razorpay
 from django.core import exceptions
 
-client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
+from utilities.utils import create_payment_link_razorpay, verify_payment_link_signature_razorpay, \
+    payment_captured, payment_failed
+
 load_dotenv()
 
 
@@ -20,75 +15,41 @@ load_dotenv()
 def create_payment_link(request):
     # creating a payment link
     try:
-        payment_link = client.payment_link.create(
-            # The data should be passed in this format
-            {
-                # total amount of the product(in smallest unit, for INR, its paise) required
-                "amount": request.data.get('amount'),
-                # takes INR by default not req (comes in mail in payment link)
-                "currency": "INR",
-                # description of the product not req (comes in mail in payment link)
-                "description": request.data.get('description'),
-                # details of the customer (name not req, email req if u want to notify via email, same for phone)
-                "customer": request.data.get('customer'),
-                # notify the payment link via sms and email
-                "notify": {
-                    "sms": True,
-                    "email": True,
-                },
-                "notes": {
-                    "address": request.data.get('address')
-                },
-                "reference_id": uuid.uuid4().hex[:6].upper(),
-                # handler of payment
-                "callback_url": request.build_absolute_uri() + "callback-url/",
-                "callback_method": "get"
-            })
+        payment_link = create_payment_link_razorpay(request)
         return Response(payment_link, status=status.HTTP_200_OK)
+    except ValueError as value_error:
+        return Response({"ValueError_message": str(value_error)}, status=status.HTTP_406_NOT_ACCEPTABLE)
     except exceptions.BadRequest:
         return Response({"message": "Payment link creation failed."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-'''Handler of callback url'''
-
-
 class PaymentHandler(APIView):
     def get(self, request):
-
         try:
-            params = {
-                # get payment_link_id from request
-                'payment_link_id': request.GET.get('razorpay_payment_link_id'),
-                # get payment_link_reference_id from request
-                'payment_link_reference_id': request.GET.get('razorpay_payment_link_reference_id'),
-                # get payment_link_status from request
-                'payment_link_status': request.GET.get('razorpay_payment_link_status'),
-                # get razorpay_payment_id from request
-                'razorpay_payment_id': request.GET.get('razorpay_payment_id'),
-                # get razorpay_signature from request
-                'razorpay_signature': request.GET.get('razorpay_signature')
-            }
-            # verify payment link signature
-            client.utility.verify_payment_link_signature(params)
-            # if verified payment_link_signature
-            return Response({"message": "Payment is successful."}, status=status.HTTP_200_OK)
+            verify_payment_link = verify_payment_link_signature_razorpay(request)
+            return Response({"payment_link_verified": verify_payment_link, "message": "Payment is successful."},
+                            status=status.HTTP_200_OK)
         except exceptions.BadRequest:
-            return Response({"message": "Payment link details not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({"message": "Payment link not verified"}, status=status.HTTP_404_NOT_FOUND)
 
     # required for webhook
     # this will work if you use ngrok and post generated url in razorpay dashboard setting webhook url
     def post(self, request):
-        captured_data = json.loads(request.body)
-        client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
-                                                request.headers['X-Razorpay-Signature'],
-                                                os.environ.get('RAZORPAY_SECRET_KEY'))
-        # if payment is captured
-        if captured_data['event'] == 'payment.captured':
-            return Response({"message": "Payment Succeeded"}, status=status.HTTP_200_OK)
-        # if payment is not captured or payment is failed.
-        elif captured_data['event'] == 'payment.failed':
-            return Response({"message": "Payment Failed"}, status=status.HTTP_205_RESET_CONTENT)
+        captured = payment_captured(request)
+        if captured:
+            return Response({"payment": "Captured"}, status=status.HTTP_200_OK)
+        failed = payment_failed(request)
+        if failed:
+            return Response({"payment": "Failed"}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
 
 
 
