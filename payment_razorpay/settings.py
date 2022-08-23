@@ -31,9 +31,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['payment-razorpay-drf.herokuapp.com', '127.0.0.1', '9bba-115-246-26-54.in.ngrok.io']
 
 
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

@@ -70,6 +70,8 @@ client.payment_link.create({
   "callback_method": "get"
 })
 ```
+> **_Note_** : Payment Link will be valid for six months from the date of creation. Please note that the expire by date cannot exceed more than six months from the date of creation.
+
 The query parameters will be added to url as
 
     https://example-callback-url.com/?razorpay_payment_id=pay_Fc8mUeDrEKf08Y&razorpay_payment_link_id=plink_Fc8lXILABzQL7M&razorpay_payment_link_reference_id=TSsd1989&razorpay_payment_link_status=partially_paid&razorpay_signature=b0ea302006d9c3da504510c9be482a647d5196b265f5a82aeb272888dcbee70e
@@ -184,3 +186,50 @@ Webhook Example
 - Let’s say you’ve registered to receive the payment.captured event and a customer clicks the “Pay” button in your app or website. A webhook between Razorpay and your app tells your app whether the customer’s payment is successful or not. After your webhook endpoint receives the payment.captured event, your webhook function can then run backend actions as per your logic. Using an API for this workflow is like calling the API every millisecond to ask, was the payment successful?
 
 > **_NOTE_** : For event handler, the webhook has POST request which will be executed first and not the get request.
+
+## Limits / Transaction :
+<hr>
+
+Netbanking 
+
+₹5,00,000
+
+<br>
+
+
+Cards 
+
+No limit.
+
+<br>
+UPI 
+
+₹1,00,000 . [FYI](https://razorpay.com/docs/payments/payment-methods/transaction-limits/upi/)
+
+<br>
+
+Wallets
+
+• For non-KYC Merchants: ₹10,000
+• For KYC Merchants: ₹1,00,000
+
+<br>
+
+PayLater
+
+• ICICI Bank PayLater: ₹30,000
+• GetSimpl: ₹30,000
+• FlexiPay by HDFC Bank: ₹60,000 (Minimum limit: ₹2,000)
+
+<br>
+
+PayPal
+
+As per the limit of your PayPal account (this is usually USD 10,000 for the verified PayPal account).
+
+
+> **_NOTE_** : The settlements are made in INR. The payment is converted using the exchange rate at the time of payment creation.
+
+> **_NOTE_** : GST is not mandatory if your business does not have an annual turnover of over ₹20 lakhs. However, if you do not provide your GST details, you would not be able to claim TDS at the time of filing your tax returns.
+
+> **_NOTE_** : 18% GST is charged on the fee deducted for all payment methods except domestic card transactions of amount <= ₹ 2,000 
