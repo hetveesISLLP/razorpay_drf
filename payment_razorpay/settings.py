@@ -28,7 +28,7 @@ RAZORPAY_SECRET_KEY = os.environ.get('RAZORPAY_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['payment-razorpay-drf.herokuapp.com', '127.0.0.1', '9bba-115-246-26-54.in.ngrok.io']
+ALLOWED_HOSTS = ['payment-razorpay-drf.herokuapp.com', '127.0.0.1', 'dcc7-115-246-26-54.in.ngrok.io']
 
 
 INSTALLED_APPS = [

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import create_payment_link, PaymentHandler, GetPaymentLinks, GetDetailPaymentLink
+from .views import create_payment_link, PaymentHandler, GetPaymentLinks, GetDetailPaymentLink, home
 
 urlpatterns = [
 
@@ -11,4 +11,6 @@ urlpatterns = [
     path('all_payment_links/', GetPaymentLinks.as_view(), name='all_payment_links'),
     # fetch particular payment link
     path('payment_links/<paymentLinkId>/', GetDetailPaymentLink.as_view(), name='particular_payment_links'),
+    path('', home, name='home'),
+    # path('callback-url/', call, name='call'),
 ]

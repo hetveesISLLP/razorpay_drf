@@ -5,6 +5,12 @@ import re
 import json
 from django.core import exceptions
 
+currency_pattern = "([A-Z]){3}"
+
+email_format = r"\b[A-Za-z0-9._]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{1,}\b"
+
+contact_pattern = "^\\+?[1-9][0-9]{7,14}$"
+
 supported_currency = ['AED', 'ALL', 'AMD', 'ARS', 'AUD', 'AWG', 'BBD', 'BDT', 'BMD', 'BND', 'BOB', 'BSD', 'BWP',
                       'BZD', 'CAD', 'CHF', 'CNY', 'COP', 'CRC', 'CUP', 'CZK', 'DKK', 'DOP', 'DZD', 'EGP', 'ETB',
                       'EUR', 'FJD', 'GBP', 'GHS', 'GIP', 'GMD', 'GTQ', 'GYD', 'HKD', 'HNL', 'HRK', 'HTG', 'HUF',
@@ -30,10 +36,12 @@ def create_payment_link_razorpay(request):
         raise exceptions.BadRequest("Currency cant exceed 5,00,000.00 or 50000000 .")
 
     description = request.data.get('description')
+    if description:
+        if type(description) != str:
+            raise TypeError("Description is required in string only.")
 
     currency = request.data.get('currency')
 
-    currency_pattern = "([A-Z]){3}"
     if not currency:
         raise exceptions.FieldDoesNotExist("Currency is required in integer format only.")
     if type(currency) != str:
@@ -50,7 +58,7 @@ def create_payment_link_razorpay(request):
         raise exceptions.FieldDoesNotExist("Customer details are required")
 
     email = customer.get('email')
-    email_format = r'\b[A-Za-z0-9._]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{1,}\b'
+
     if email:
         if type(email) != str:
             raise TypeError("Customer's email must be string")
@@ -58,7 +66,7 @@ def create_payment_link_razorpay(request):
             raise exceptions.ImproperlyConfigured("Customer's email must be in name@domain.com")
 
     contact = customer.get('contact')
-    contact_pattern = "^\\+?[1-9][0-9]{7,14}$"
+
     if contact:
         if type(contact) != str:
             raise TypeError("Customer's contact must be string")
@@ -94,6 +102,10 @@ def create_payment_link_razorpay(request):
                 "First Minimum Partial Amount is required if you want to accept partial payment")
         if type(first_min_partial_amount) != int:
             raise TypeError("First Minimum Partial Amount must be integer")
+        if first_min_partial_amount < 100:
+            raise ValueError("First minimum partial amount should be greater than 100 INR.")
+        if first_min_partial_amount > amount:
+            raise ValueError("First minimum partial amount should be less than payable amount.")
 
     reminder_enable = request.data.get('reminder_enable')
     if reminder_enable:
@@ -137,12 +149,10 @@ def check_webhook(request):
     client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                             request.headers['X-Razorpay-Signature'],
                                             os.environ.get('RAZORPAY_SECRET_KEY'))
-    # check
-    if captured_data['event'] == 'payment.captured':
-        return captured_data['event']
-    if captured_data['event'] == 'payment.failed':
-        return captured_data['event']
-
+    print(captured_data['event'], "jdkkkkkkkkkkkkk")
+    if captured_data['event'] == 'payment.captured' or captured_data['event'] == 'payment.failed':
+        return True
+    return False
 
 # {
 #     "amount": 1000,
