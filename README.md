@@ -190,46 +190,25 @@ Webhook Example
 ## Limits / Transaction :
 <hr>
 
-Netbanking 
 
-₹5,00,000
-
-<br>
-
-
-Cards 
-
-No limit.
-
-<br>
-UPI 
-
-₹1,00,000 . [FYI](https://razorpay.com/docs/payments/payment-methods/transaction-limits/upi/)
-
-<br>
-
-Wallets
-
-• For non-KYC Merchants: ₹10,000
-• For KYC Merchants: ₹1,00,000
-
-<br>
-
-PayLater
-
-• ICICI Bank PayLater: ₹30,000
-• GetSimpl: ₹30,000
-• FlexiPay by HDFC Bank: ₹60,000 (Minimum limit: ₹2,000)
-
-<br>
-
-PayPal
-
-As per the limit of your PayPal account (this is usually USD 10,000 for the verified PayPal account).
+> Max amt : 5,00,000
+>
+> net banking : 5,00,000
+>
+> cards : 5,00,000
+>  
+> wallet : 99,999
+> 
+> pay later : 5,00,000
+>  
+> UPI : 1,00,000
+>
+> QR : valid for 11:55
 
 
 > **_NOTE_** : The settlements are made in INR. The payment is converted using the exchange rate at the time of payment creation.
 
 > **_NOTE_** : GST is not mandatory if your business does not have an annual turnover of over ₹20 lakhs. However, if you do not provide your GST details, you would not be able to claim TDS at the time of filing your tax returns.
 
-> **_NOTE_** : 18% GST is charged on the fee deducted for all payment methods except domestic card transactions of amount <= ₹ 2,000 
+> **_NOTE_** : 18% GST is charged on the fee deducted for all payment methods except domestic card transactions of amount <= ₹ 2,000
+
