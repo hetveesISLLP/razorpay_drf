@@ -38,8 +38,8 @@ class PaymentHandler(APIView):
     # required for webhook
     # this will work if you use ngrok and post generated url in razorpay dashboard setting webhook url
     def post(self, request):
-        webhook, status = check_webhook(request)
-        if status:
+        webhook, status_webhook = check_webhook(request)
+        if status_webhook:
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -53,21 +53,6 @@ class GetPaymentLinks(APIView):
 
 class GetDetailPaymentLink(APIView):
 
-    def get(self, request, paymentLinkId):
-        links = fetch_particular_payment_link(paymentLinkId=paymentLinkId)
+    def get(self, request, payment_link_id):
+        links = fetch_particular_payment_link(payment_link_id=payment_link_id)
         return Response(links, status=status.HTTP_200_OK)
-
-
-# Data to be passed as :
-# {
-#     "amount": 500,
-#     "description": "djkshcvdkcjd",
-#     "customer":{
-#         "name": "Hetu",
-#         "email": "sjd@dhcde.com",
-#         "contact": "+91123456789"
-#     },
-#     "notes": {
-#         "address": "asdjhwjidws"
-#     }
-# }
