@@ -23,9 +23,6 @@ supported_currency = ['AED', 'ALL', 'AMD', 'ARS', 'AUD', 'AWG', 'BBD', 'BDT', 'B
 client = razorpay.Client(auth=(os.environ.get('RAZORPAY_KEY_ID'), os.environ.get('RAZORPAY_SECRET_KEY')))
 
 
-# max transaction amount per dy, upi, scanner
-
-
 def create_payment_link_razorpay(request):
     amount = request.data.get('amount')
     if not amount:
@@ -149,9 +146,9 @@ def check_webhook(request):
     client.utility.verify_webhook_signature(str(request.body, 'utf-8'),
                                             request.headers['X-Razorpay-Signature'],
                                             os.environ.get('RAZORPAY_SECRET_KEY'))
-    print(captured_data['event'], "jdkkkkkkkkkkkkk")
+
     if captured_data['event'] == 'payment.captured' or captured_data['event'] == 'payment.failed':
-        return True
+        return captured_data['event'], True
     return False
 
 # {
