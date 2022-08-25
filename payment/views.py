@@ -15,11 +15,12 @@ def create_payment_link(request):
         return Response(payment_link, status=status.HTTP_200_OK)
     except ValueError as value_error:
         return Response({"message": str(value_error)}, status=status.HTTP_406_NOT_ACCEPTABLE)
+    except TypeError as type_error:
+        return Response({"message": str(type_error)}, status=status.HTTP_406_NOT_ACCEPTABLE)
     except exceptions.FieldDoesNotExist as field_not_found:
         return Response({"message": str(field_not_found)}, status=status.HTTP_406_NOT_ACCEPTABLE)
     except exceptions.ImproperlyConfigured as improperly_configured_error:
-        return Response({"message": str(improperly_configured_error)},
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+        return Response({"message": str(improperly_configured_error)}, status=status.HTTP_406_NOT_ACCEPTABLE)
     except exceptions.FieldError as field_error:
         return Response({"message": str(field_error)}, status=status.HTTP_406_NOT_ACCEPTABLE)
     except exceptions.BadRequest as bad_request_error:

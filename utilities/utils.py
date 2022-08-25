@@ -4,7 +4,7 @@ import razorpay
 import re
 import json
 from django.core import exceptions
-
+import requests
 
 EMAIL_FORMAT = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{1,}\b"
 
@@ -19,22 +19,35 @@ SUPPORTED_CURRENCY = ['AED', 'ALL', 'AMD', 'ARS', 'AUD', 'AWG', 'BBD', 'BDT', 'B
                       'SEK', 'SGD', 'SLL', 'SOS', 'SSP', 'SVC', 'SZL', 'THB', 'TTD', 'TZS', 'USD', 'UYU', 'UZS',
                       'YER', 'ZAR']
 
+CURRENCY_CONVERTER_URL = 'https://api.exchangerate-api.com/v4/latest/INR'
+
+
+class RealTimeCurrencyConverter():
+    def __init__(self, url):
+        self.data = requests.get(url).json()
+        self.currencies = self.data['rates']
+
+    def convert(self, from_currency, to_currency, amount):
+        if from_currency != 'INR':
+            amount = amount / self.currencies[from_currency]
+        amount = int(amount * self.currencies[to_currency])
+        return amount
+
+
 client = razorpay.Client(auth=(os.environ.get('RAZORPAY_KEY_ID'), os.environ.get('RAZORPAY_SECRET_KEY')))
 
 
-def create_payment_link_razorpay(request: object) -> object:
-    amount = request.data.get('amount')
-    if not amount:
-        raise exceptions.FieldDoesNotExist("Amount is required")
-    if type(amount) != int:
-        raise TypeError("Currency is required in integer format only.")
-    # todo
-    if amount > 50000000:
-        raise exceptions.BadRequest("Currency cant exceed 5,00,000.00 or 50000000.")
+def create_payment_link_razorpay(request):
 
     description = request.data.get('description')
     if description and type(description) != str:
         raise TypeError("Description is required in string only.")
+
+    amount = request.data.get('amount')
+    if not amount:
+        raise exceptions.FieldDoesNotExist("Amount is required")
+    if type(amount) not in [float, int]:
+        raise TypeError("Amount is required in integer format only.")
 
     currency = request.data.get('currency')
     if not currency:
@@ -44,6 +57,12 @@ def create_payment_link_razorpay(request: object) -> object:
     currency = currency.upper()
     if currency.upper() not in SUPPORTED_CURRENCY:
         raise exceptions.ImproperlyConfigured("Currency must be from ", SUPPORTED_CURRENCY)
+
+    converter = RealTimeCurrencyConverter(CURRENCY_CONVERTER_URL)
+    inr_amount = converter.convert(currency, 'INR', amount)
+    if inr_amount > 500000:
+        raise exceptions.BadRequest("Currency cant exceed 5,00,000 INR.")
+    amount *= 100
 
     customer = request.data.get('customer')
     if not customer:
@@ -126,10 +145,10 @@ def check_webhook(request):
     else:
         return False
 
+
 def fetch_all_payment_links():
     return client.payment_link.all()
 
 
 def fetch_particular_payment_link(payment_link_id):
     return client.payment_link.fetch(payment_link_id)
-
