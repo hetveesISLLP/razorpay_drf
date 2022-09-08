@@ -8,7 +8,7 @@
 * [Razorpay Account](https://razorpay.com/)
 * <b>API_KEY and API_SECRET</b>
 
-API_KEY and API_SECRET will be generated once you create an account in Razorpay. On your Dashboard > Settings > API Keys > Generate Key.
+  (API_KEY and API_SECRET will be generated once you create an account in Razorpay. On your Dashboard > Settings > API Keys > Generate Key.)
 
 > **_NOTE:_**  Kindly store YOUR_API_SECRET somewhere as it will be used many times.
 
@@ -30,40 +30,21 @@ In your views.py file, update your client using API_KEY and API_SECRET
 client = razorpay.Client(auth=("<YOUR_API_KEY>", "<YOUR_API_SECRET>"))
 ```
 
-Pass the following data as per requirement to test the API
+Pass the following data as per requirement to test the API as a POST request
 ```json
 {
     "accept_partial": false,
     "amount": 20000,
-    "amount_paid": 0,
-    "callback_method": "get",
-    "callback_url": "http://127.0.0.1:8000/create_payment_link/callback-url/",
-    "cancelled_at": 0,
-    "created_at": 1662630384,
     "currency": "INR",
     "customer": {
         "contact": "8866911353",
         "email": "shahhetu.hs@gmail.com"
     },
     "description": "buying abc",
-    "expire_by": 0,
-    "expired_at": 0,
-    "first_min_partial_amount": 0,
-    "id": "plink_KFMTVyweoAqsnC",
-    "notes": null,
     "notify": {
         "email": true,
         "sms": true
-    },
-    "payments": null,
-    "reference_id": "f487fb06-9b5a-445f-a5af-a63b4316e0ad",
-    "reminder_enable": false,
-    "reminders": [],
-    "short_url": "https://rzp.io/i/itOmoOuBB",
-    "status": "created",
-    "updated_at": 1662630384,
-    "upi_link": false,
-    "user_id": ""
+    }
 }
 ```
 
@@ -108,6 +89,8 @@ Razorpay Webhooks can be used to configure and receive notifications when a spec
 
 > **_Note_** : In webhook URLs, only port numbers 80 and 443 are currently allowed.
 
+### Webhook Configuration 
+
 Inside [Razorpay Dashboard](https://razorpay.com/) navigate to Settings > Webhooks > Add New Webhook.
 
 1. Enter the URL where you want to receive the webhook payload when an event is triggered. We recommended using an HTTPS URL.
@@ -115,7 +98,6 @@ Inside [Razorpay Dashboard](https://razorpay.com/) navigate to Settings > Webhoo
 3. In the Alert Email field, enter the email address to which the notifications should be sent in case of webhook failure. You will receive webhook deactivation notifications to this email address.
 4. Select the required events from the list of Active Events.
 
-<br>
 
 > **_Note_** :
 > - All webhook responses must return a status code in the range 2XX within a window of 5 seconds.If response codes other than this is received or the request times out, it is considered a failure. 
@@ -130,7 +112,7 @@ Inside [Razorpay Dashboard](https://razorpay.com/) navigate to Settings > Webhoo
 
 > **_Note_** : Here we are using in [ngrok](https://ngrok.com/)
     
-Installation and Configuration :
+#### Installation and Configuration :
 
 `sudo snap install ngrok`
   * Create account 
@@ -150,29 +132,3 @@ Webhook Example
 - Let’s say you’ve registered to receive the payment.captured event and a customer clicks the “Pay” button in your app or website. A webhook between Razorpay and your app tells your app whether the customer’s payment is successful or not. After your webhook endpoint receives the payment.captured event, your webhook function can then run backend actions as per your logic. Using an API for this workflow is like calling the API every millisecond to ask, was the payment successful?
 
 > **_NOTE_** : For event handler, the webhook has POST request which will be executed first and not the get request.
-
-## Limits / Transaction :
-<hr>
-
-
-> Max amt : 5,00,000
->
-> net banking : 5,00,000
->
-> cards : 5,00,000
->  
-> wallet : 99,999
-> 
-> pay later : 5,00,000
->  
-> UPI : 1,00,000
->
-> QR : valid for 11:55
-
-
-> **_NOTE_** : The settlements are made in INR. The payment is converted using the exchange rate at the time of payment creation.
-
-> **_NOTE_** : GST is not mandatory if your business does not have an annual turnover of over ₹20 lakhs. However, if you do not provide your GST details, you would not be able to claim TDS at the time of filing your tax returns.
-
-> **_NOTE_** : 18% GST is charged on the fee deducted for all payment methods except domestic card transactions of amount <= ₹ 2,000
-

@@ -73,6 +73,7 @@ client.payment_link.fetch(paymentLinkId)
 ### Validate Webhooks
 ```python
 import razorpay
+client = razorpay.Client(auth=("YOUR_ID", "YOUR_SECRET"))
 client.utility.verify_webhook_signature(webhook_body, webhook_signature, webhook_secret)
 ```
 Parameters
@@ -83,4 +84,30 @@ Parameters
 
 * webhook_secret : Enter you webhook secret that you entered while creating webhook on dashboard
 
+
+
+## Limits / Transaction :
+<hr>
+
+
+> Max amt : 5,00,000
+>
+> net banking : 5,00,000
+>
+> cards : 5,00,000
+>  
+> wallet : 99,999
+> 
+> pay later : 5,00,000
+>  
+> UPI : 1,00,000
+>
+> QR : valid for 11:55
+
+
+> **_NOTE_** : The settlements are made in INR. The payment is converted using the exchange rate at the time of payment creation.
+
+> **_NOTE_** : GST is not mandatory if your business does not have an annual turnover of over ₹20 lakhs. However, if you do not provide your GST details, you would not be able to claim TDS at the time of filing your tax returns.
+
+> **_NOTE_** : 18% GST is charged on the fee deducted for all payment methods except domestic card transactions of amount <= ₹ 2,000
 
