@@ -342,7 +342,7 @@ fabric.properties
 
 # Celery stuff
 **/dump.rdb
-
+*/migrations
 # SageMath parsed files
 
 # Environments
