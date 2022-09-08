@@ -4,9 +4,7 @@
 
 [Python](https://www.python.org/downloads/), [Django](https://docs.djangoproject.com/en/4.0/topics/install/), [DRF](https://www.django-rest-framework.org/)
 
-<br>
-
-### Installation
+<br>### Installation
 <hr>
 
 > pip install razorpay
